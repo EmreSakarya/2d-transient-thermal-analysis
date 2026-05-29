@@ -15,36 +15,58 @@ A `6 cm × 16 cm × 1 cm` plate is discretized on a **3 × 5 node grid**
 
 1. **Heating phase** — the plate is heated from `300 K` by four local, variable
    volumetric heat sources (`28–37 kW/m³`) applied through spring clamps at its
-   four corners, under fully **adiabatic** boundary conditions, until *every*
-   node reaches at least `1000 K`.
+   four corners, under fully **adiabatic** boundaries, until *every* node reaches `1000 K`.
 
 2. **Cooling phase** — the heated plate is immersed in a **liquid-metal bath**
-   whose temperature decreases linearly in time. There is no heat generation;
-   all six faces lose heat by **natural convection**, with the convection
-   coefficient computed locally from the **Rayleigh number** at each node and
-   time step, until every node cools below `600 K`.
+   whose temperature decreases linearly in time. With no heat generation, all six
+   faces lose heat by **natural convection**, with the convection coefficient
+   computed locally from the **Rayleigh number** at each node and time step,
+   until every node cools below `600 K`.
 
 The thermophysical properties of **both** the solid plate and the liquid-metal
 coolant (`k`, `ρ`, `cₚ`, `μ`, `β`, …) are **temperature dependent** and are
 re-evaluated at every node on every time step, making the governing equations
 strongly non-linear.
 
+<p align="center"><img src="images/node_diagram_final.png" width="42%" alt="2D nodal network and control volumes"></p>
+
 ---
 
 ## Method
 
 * **Control Volume Finite Difference Method (CVFDM):** boundary and corner nodes
-  own half (or quarter) control volumes; interior nodes own a full cell.
-* **Conduction** between adjacent nodes uses the arithmetic mean of the
-  interface conductivities (Fourier's law).
-* **Explicit Euler** time stepping — each node is updated independently, which
-  makes incorporating temperature-dependent properties straightforward.
-* **Stability:** the heating step is capped by the diffusion limit evaluated at
-  the maximum diffusivity (1000 K); the cooling step is re-derived from the
-  local convection + conduction terms (high Biot number ⇒ very small `Δt`).
-* **Natural convection correlations:** horizontal top/bottom faces and vertical
-  side faces use separate Nusselt-number correlations (incl. Churchill–Chu for
-  vertical faces), all functions of the local Rayleigh number.
+  own half / quarter control volumes; interior nodes own a full cell.
+* **Conduction** between adjacent nodes uses the arithmetic mean of the interface
+  conductivities (Fourier's law).
+* **Explicit Euler** time stepping — each node is updated independently, making it
+  straightforward to incorporate temperature-dependent properties.
+* **Stability:** the heating step is capped by the diffusion limit at maximum
+  diffusivity (1000 K); the cooling step is re-derived from the local convection +
+  conduction terms (high Biot number ⇒ very small `Δt`).
+* **Natural convection:** separate Nusselt correlations for horizontal top/bottom
+  faces and vertical side faces (incl. Churchill–Chu), all functions of the local Ra.
+
+<table>
+<tr>
+<td width="50%"><img src="images/fig01_solid_props.png" alt="Temperature-dependent solid properties"><br><sub><b>Solid plate properties</b> — k, ρ, cₚ vs. temperature.</sub></td>
+<td width="50%"><img src="images/fig06_liquid_props.png" alt="Temperature-dependent liquid-metal properties"><br><sub><b>Liquid-metal properties</b> & Rayleigh number vs. temperature.</sub></td>
+</tr>
+</table>
+
+---
+
+## Results Gallery
+
+**Temperature distribution at the end of the heating phase** — every node has exceeded the 1000 K target:
+
+<p align="center"><img src="images/temperature_heatmap.png" width="48%" alt="2D temperature distribution map"></p>
+
+<table>
+<tr>
+<td width="50%"><img src="images/fig02_heat_edge.png" alt="Heating curves at corner nodes"><br><sub><b>Heating phase</b> — corner (clamp) node temperatures rising to 1000 K.</sub></td>
+<td width="50%"><img src="images/fig07_cool_all.png" alt="Cooling curves for all node groups"><br><sub><b>Cooling phase</b> — all node groups tracking the falling bath temperature.</sub></td>
+</tr>
+</table>
 
 ---
 
@@ -59,10 +81,9 @@ strongly non-linear.
 | Cooling stability limit `Δt` | ≈ `0.017 s` (Bi ≫ 1) |
 | Time for all nodes to drop below 600 K | ≈ `1920 s` (≈ `32 min`) |
 
-The very small cooling time step and the residual temperature lag between the
-plate and the bath confirm that the internal conduction resistance dominates the
-surface convection resistance (`Bi ≫ 1`), placing the system well outside the
-lumped-capacitance regime.
+The very small cooling time step and the residual lag between the plate and the
+bath confirm that internal conduction resistance dominates surface convection
+resistance (`Bi ≫ 1`), placing the system well outside the lumped-capacitance regime.
 
 ---
 
@@ -74,6 +95,7 @@ lumped-capacitance regime.
 | `node_diagram.py` | Methodology schematic of the 3×5 nodal network and control volumes. |
 | `temperature_heatmap.py` | Color-coded map of the final nodal temperatures after heating. |
 | `requirements.txt` | Python dependencies (`numpy`, `matplotlib`). |
+| `images/` | Pre-generated figures used in this README. |
 
 ---
 
@@ -82,17 +104,13 @@ lumped-capacitance regime.
 ```bash
 pip install -r requirements.txt
 
-python thermal_analysis.py      # runs the full simulation, prints results, saves Figures 1-8
+python thermal_analysis.py      # full simulation, prints results, saves Figures 1-8
 python node_diagram.py          # saves node_diagram_final.png
 python temperature_heatmap.py   # saves temperature_heatmap.png
 ```
-
-Running `thermal_analysis.py` prints the stability, heating, time-step and
-cooling summaries to the console and writes the figures (`fig01_*.png` …
-`fig08_*.png`) to the working directory.
 
 ---
 
 ## Author
 
-**Emre Sakarya** — Nuclear Engineering, Hacettepe University.
+**Emre Sakarya** — Nuclear Engineering, Hacettepe University (Student ID: 2230386062).
