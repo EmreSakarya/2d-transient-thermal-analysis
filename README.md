@@ -85,6 +85,9 @@ The very small cooling time step and the residual lag between the plate and the
 bath confirm that internal conduction resistance dominates surface convection
 resistance (`Bi ≫ 1`), placing the system well outside the lumped-capacitance regime.
 
+Full derivations, discussion and the Star-CCM+ comparison are in the
+[project report](docs/2D_Transient_Thermal_Analysis_Report.pdf).
+
 ---
 
 ## Repository Contents
@@ -96,6 +99,7 @@ resistance (`Bi ≫ 1`), placing the system well outside the lumped-capacitance 
 | `temperature_heatmap.py` | Color-coded map of the final nodal temperatures after heating. |
 | `requirements.txt` | Python dependencies (`numpy`, `matplotlib`). |
 | `images/` | Pre-generated figures used in this README. |
+| `docs/2D_Transient_Thermal_Analysis_Report.pdf` | Full project report (NEM 394 Final Project). |
 
 ---
 
